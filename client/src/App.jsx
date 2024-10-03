@@ -73,7 +73,7 @@ const App = () => {
       </Typography>
 
       <form onSubmit={joinRoomHandler}>
-        <h4>Join Room</h4>
+        <h3>Join Room</h3>
         <TextField
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
@@ -105,7 +105,7 @@ const App = () => {
           bgcolor: "background.paper",
         }}
       >
-        <h4>Type your Messages</h4>
+        <h3>Message Box</h3>
         <TextField
           value={message}
           onChange={(e) => setMessage(e.target.value)}
