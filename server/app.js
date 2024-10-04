@@ -31,26 +31,33 @@ app.get("/login", (req, res) => {
   res.send("Hello World");
 });
 
+const users={};
 
 io.on("connection", (socket) => {
   console.log("User Connected ", socket.id);
 
   socket.on("message", ({ room, message }) => {
     console.log({ room, message });
-    //  socket.broadcast.emit("receive-message",message);
     socket.to(room).emit("receive-message", message);
   });
 
   socket.on("join-room", (room) => {
     socket.join(room);
-    // console.log(`User joined the ${room}`);
+    if(!users[room]){
+      users[room]=[];
+    }
+    users[room].push(socket.id);
+    io.to(room).emit("active-users",users[room]);
   });
-
-  //    socket.emit("welcome","welcome to the server.");
-  //    socket.broadcast.emit("welcome",`${socket.id} joined the server.`);
 
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
+    // BroadCast a message when someone leave the room
+    io.emit("receive-message",{data: `${socket.id} left the room.`});
+    for(const room in users){
+      users[room]=users[room].filter((user)=>user!==socket.id);
+      io.to(room).emit("active-users",users[room]);
+    }
   });
 });
 
