@@ -18,6 +18,7 @@ const App = () => {
   const [socketID, setSocketID] = useState("");
   const [messages, setMessages] = useState([]);
   const [roomName, setRoomName] = useState("");
+  const [activeUsers,setActiveUsers]=useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,9 +45,7 @@ const App = () => {
       console.log("connected", socket.id);
     });
 
-    socket.on("receive-message", (data) => {
-      // console.log(data);
-      // setMessages([...messages,data]);
+    socket.on("receive-message", ({data}) => {
       setMessages((messages) => [...messages, data]);
     });
 
@@ -54,10 +53,14 @@ const App = () => {
       console.log(m);
     });
 
+    socket.on("active-users",(users)=>{
+      setActiveUsers(users);
+    });
+
     return () => {
       socket.disconnect(); //clean up function
     };
-  }, []);
+  }, [socket]);
 
   return (
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 4 }}>
@@ -138,6 +141,22 @@ const App = () => {
       </Box>
 
       {/* Messages Display */}
+      <Paper elevation={3} sx={{ mt: 4, p: 2 }}>
+      <Typography variant="h6" component="div" gutterBottom>
+        Active Users in Room:
+      </Typography>
+      {activeUsers.length === 0 ? (
+        <Typography variant="body1" color="textSecondary">
+          No users in the room.
+        </Typography>
+      ) : (
+        activeUsers.map((user, i) => (
+          <Typography key={i} variant="body1" component="div" gutterBottom>
+            {user}
+          </Typography>
+        ))
+      )}
+    </Paper>
       <Paper
         elevation={3}
         sx={{
